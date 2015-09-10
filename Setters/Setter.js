@@ -7,6 +7,7 @@ var GenericSetter = (function () {
     function GenericSetter(config) {
         var _this = this;
         this.modify = function (f) { return _this.config.modify(f); };
+        this.set = function (x) { return _this.modify(function (piece) { return x; }); };
         this.prop = function (select) {
             return function (update) {
                 return new GenericSetter({
@@ -37,8 +38,8 @@ var ArraySetter = (function (_super) {
             return function (update) {
                 return new GenericSetter({
                     modify: function (f) { return _this.config.modify(function (pieces) {
-                        var newPieces = f(pieces.map(select(piece)));
-                        return pieces.map();
+                        var newProps = f(pieces.map(select));
+                        return pieces.map(function (piece, i) { return merge(piece, update(newProps[i])); });
                     }); }
                 });
             };

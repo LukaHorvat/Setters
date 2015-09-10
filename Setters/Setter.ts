@@ -8,6 +8,7 @@ class GenericSetter<TWhole, TPiece> {
         this.config = config;
     }
     modify = (f: (piece: TPiece) => TPiece) => this.config.modify(f)
+    set = (x: TPiece) => this.modify(piece => x)
     prop = <TProp>(select: (piece: TPiece) => TProp) =>
         (update: <TUpdate>(prop: TProp) => TUpdate) =>
             new GenericSetter<TWhole, TProp>({
@@ -30,8 +31,8 @@ class ArraySetter<TWhole, TPiece> extends GenericSetter<TWhole, TPiece[]> {
         (update: <TUpdate>(prop: TProp) => TUpdate) =>
             new GenericSetter<TWhole, TProp[]>({
                 modify: (f) => this.config.modify(pieces => {
-                    const newPieces = f(pieces.map(select(piece)));
-                    return pieces.map(
+                    const newProps = f(pieces.map(select));
+                    return pieces.map((piece, i) => merge(piece, update(newProps[i])));
                 })
             })
 }
