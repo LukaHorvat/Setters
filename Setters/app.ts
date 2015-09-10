@@ -17,7 +17,7 @@ window.onload = () => {
             }]
     }
     console.log(Setter.setter(initial)
-        .propA(obj => obj.test)(obj => ({ test: obj }))
-        .all(obj => obj.prop)(obj => ({ prop: obj }))
+        .propA(obj => obj.test, "test")
+        .all(obj => obj.prop, "prop")
         .modify(scanAppendStrings));
 };

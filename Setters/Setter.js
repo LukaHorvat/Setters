@@ -8,19 +8,15 @@ var GenericSetter = (function () {
         var _this = this;
         this.modify = function (f) { return _this.config.modify(f); };
         this.set = function (x) { return _this.modify(function (piece) { return x; }); };
-        this.prop = function (select) {
-            return function (update) {
-                return new GenericSetter({
-                    modify: function (f) { return _this.config.modify(function (piece) { return merge(piece, update(f(select(piece)))); }); }
-                });
-            };
+        this.prop = function (select, prop) {
+            return new GenericSetter({
+                modify: function (f) { return _this.config.modify(function (piece) { return merge(piece, (_a = {}, _a[prop] = f(select(piece)), _a)); var _a; }); }
+            });
         };
-        this.propA = function (select) {
-            return function (update) {
-                return new ArraySetter({
-                    modify: function (f) { return _this.config.modify(function (piece) { return merge(piece, update(f(select(piece)))); }); }
-                });
-            };
+        this.propA = function (select, prop) {
+            return new ArraySetter({
+                modify: function (f) { return _this.config.modify(function (piece) { return merge(piece, (_a = {}, _a[prop] = f(select(piece)), _a)); var _a; }); }
+            });
         };
         this.config = config;
     }
@@ -34,15 +30,21 @@ var ArraySetter = (function (_super) {
         this.each = new GenericSetter({
             modify: function (f) { return _this.config.modify(function (pieces) { return pieces.map(f); }); }
         });
-        this.all = function (select) {
-            return function (update) {
-                return new GenericSetter({
-                    modify: function (f) { return _this.config.modify(function (pieces) {
-                        var newProps = f(pieces.map(select));
-                        return pieces.map(function (piece, i) { return merge(piece, update(newProps[i])); });
-                    }); }
-                });
-            };
+        this.all = function (select, prop) {
+            return new GenericSetter({
+                modify: function (f) { return _this.config.modify(function (pieces) {
+                    var newProps = f(pieces.map(select));
+                    return pieces.map(function (piece, i) { return merge(piece, (_a = {}, _a[prop] = newProps[i], _a)); var _a; });
+                }); }
+            });
+        };
+        this.allA = function (select, prop) {
+            return new ArraySetter({
+                modify: function (f) { return _this.config.modify(function (pieces) {
+                    var newProps = f(pieces.map(select));
+                    return pieces.map(function (piece, i) { return merge(piece, (_a = {}, _a[prop] = newProps[i], _a)); var _a; });
+                }); }
+            });
         };
     }
     return ArraySetter;

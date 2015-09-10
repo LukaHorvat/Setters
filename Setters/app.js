@@ -16,8 +16,8 @@ window.onload = function () {
             }]
     };
     console.log(Setter.setter(initial)
-        .propA(function (obj) { return obj.test; })(function (obj) { return ({ test: obj }); })
-        .all(function (obj) { return obj.prop; })(function (obj) { return ({ prop: obj }); })
+        .propA(function (obj) { return obj.test; }, "test")
+        .all(function (obj) { return obj.prop; }, "prop")
         .modify(scanAppendStrings));
 };
 //# sourceMappingURL=app.js.map

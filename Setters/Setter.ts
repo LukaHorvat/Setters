@@ -9,16 +9,14 @@ class GenericSetter<TWhole, TPiece> {
     }
     modify = (f: (piece: TPiece) => TPiece) => this.config.modify(f)
     set = (x: TPiece) => this.modify(piece => x)
-    prop = <TProp>(select: (piece: TPiece) => TProp) =>
-        (update: <TUpdate>(prop: TProp) => TUpdate) =>
-            new GenericSetter<TWhole, TProp>({
-                modify: (f) => this.config.modify(piece => merge(piece, update(f(select(piece)))))
-            })
-    propA = <TProp>(select: (piece: TPiece) => TProp[]) =>
-        (update: <TUpdate>(prop: TProp[]) => TUpdate) =>
-            new ArraySetter<TWhole, TProp>({
-                modify: (f) => this.config.modify(piece => merge(piece, update(f(select(piece)))))
-            })
+    prop = <TProp>(select: (piece: TPiece) => TProp, prop: string) =>
+        new GenericSetter<TWhole, TProp>({
+            modify: (f) => this.config.modify(piece => merge(piece, { [prop]: f(select(piece)) }))
+        })
+    propA = <TProp>(select: (piece: TPiece) => TProp[], prop: string) =>
+        new ArraySetter<TWhole, TProp>({
+            modify: (f) => this.config.modify(piece => merge(piece, { [prop]: f(select(piece)) }))
+        })
 }
 class ArraySetter<TWhole, TPiece> extends GenericSetter<TWhole, TPiece[]> {
     constructor(config: SetterConfig<TWhole, TPiece[]>) {
@@ -27,14 +25,20 @@ class ArraySetter<TWhole, TPiece> extends GenericSetter<TWhole, TPiece[]> {
     each = new GenericSetter<TWhole, TPiece>({
         modify: (f) => this.config.modify(pieces => pieces.map(f))
     })
-    all = <TProp>(select: (piece: TPiece) => TProp) =>
-        (update: <TUpdate>(prop: TProp) => TUpdate) =>
-            new GenericSetter<TWhole, TProp[]>({
-                modify: (f) => this.config.modify(pieces => {
-                    const newProps = f(pieces.map(select));
-                    return pieces.map((piece, i) => merge(piece, update(newProps[i])));
-                })
+    all = <TProp>(select: (piece: TPiece) => TProp, prop: string) =>
+        new GenericSetter<TWhole, TProp[]>({
+            modify: (f) => this.config.modify(pieces => {
+                const newProps = f(pieces.map(select));
+                return pieces.map((piece, i) => merge(piece, { [prop]: newProps[i] }));
             })
+        })
+    allA = <TProp>(select: (piece: TPiece) => TProp[], prop: string) =>
+        new ArraySetter<TWhole, TProp[]>({
+            modify: (f) => this.config.modify(pieces => {
+                const newProps = f(pieces.map(select));
+                return pieces.map((piece, i) => merge(piece, { [prop]: newProps[i] }));
+            })
+        })
 }
 class Setter {
     private static id = <T>(x: T) => x;
