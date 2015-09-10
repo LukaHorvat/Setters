@@ -1,64 +1,43 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var GenericSetter = (function () {
-    function GenericSetter(config) {
+var UntypedSetter = (function () {
+    function UntypedSetter(modify) {
         var _this = this;
-        this.modify = function (f) { return _this.config.modify(f); };
         this.set = function (x) { return _this.modify(function (piece) { return x; }); };
         this.prop = function (select, prop) {
-            return new GenericSetter({
-                modify: function (f) { return _this.config.modify(function (piece) { return merge(piece, (_a = {}, _a[prop] = f(select(piece)), _a)); var _a; }); }
-            });
+            return new UntypedSetter(function (f) { return _this.modify(function (piece) { return merge(piece, (_a = {}, _a[prop] = f(select(piece)), _a)); var _a; }); });
         };
-        this.propA = function (select, prop) {
-            return new ArraySetter({
-                modify: function (f) { return _this.config.modify(function (piece) { return merge(piece, (_a = {}, _a[prop] = f(select(piece)), _a)); var _a; }); }
-            });
-        };
-        this.config = config;
-    }
-    return GenericSetter;
-})();
-var ArraySetter = (function (_super) {
-    __extends(ArraySetter, _super);
-    function ArraySetter(config) {
-        var _this = this;
-        _super.call(this, config);
-        this.each = new GenericSetter({
-            modify: function (f) { return _this.config.modify(function (pieces) { return pieces.map(f); }); }
-        });
+        this.each = function () { return new UntypedSetter(function (f) { return _this.modify(function (pieces) { return pieces.map(f); }); }); };
         this.all = function (select, prop) {
-            return new GenericSetter({
-                modify: function (f) { return _this.config.modify(function (pieces) {
-                    var newProps = f(pieces.map(select));
-                    return pieces.map(function (piece, i) { return merge(piece, (_a = {}, _a[prop] = newProps[i], _a)); var _a; });
-                }); }
-            });
+            return new UntypedSetter(function (f) { return _this.modify(function (pieces) {
+                var newProps = f(pieces.map(select));
+                return pieces.map(function (piece, i) { return merge(piece, (_a = {}, _a[prop] = newProps[i], _a)); var _a; });
+            }); });
         };
-        this.allA = function (select, prop) {
-            return new ArraySetter({
-                modify: function (f) { return _this.config.modify(function (pieces) {
-                    var newProps = f(pieces.map(select));
-                    return pieces.map(function (piece, i) { return merge(piece, (_a = {}, _a[prop] = newProps[i], _a)); var _a; });
-                }); }
-            });
+        this.map = function (toT, fromT) {
+            return new UntypedSetter(function (f) { return _this.modify(function (piece) { return fromT(f(toT(piece))); }); });
         };
+        this.promote = function (id) { return _this; };
+        this.concat = function () {
+            return new UntypedSetter(function (f) { return _this.modify(function (piecess) {
+                var lengths = piecess.map(function (pieces) { return pieces.length; });
+                var newValues = f(flatten(piecess));
+                var res = [];
+                var lastStart = 0;
+                lengths.forEach(function (len) {
+                    res.push(newValues.slice(lastStart, lastStart + len));
+                    lastStart = lastStart + len;
+                });
+                return res;
+            }); });
+        };
+        this.modify = modify;
     }
-    return ArraySetter;
-})(GenericSetter);
-var Setter = (function () {
-    function Setter() {
+    return UntypedSetter;
+})();
+var identity = function (x) { return x; };
+var Set = (function () {
+    function Set() {
     }
-    Setter.setter = function (obj) {
-        if (obj instanceof Array)
-            return new ArraySetter({ modify: function (f) { return f(obj); } });
-        else
-            return new GenericSetter({ modify: function (f) { return f(obj); } });
-    };
-    Setter.id = function (x) { return x; };
-    return Setter;
+    Set.setter = function (obj) { return new UntypedSetter(function (f) { return f(obj); }); };
+    return Set;
 })();
 //# sourceMappingURL=Setter.js.map
