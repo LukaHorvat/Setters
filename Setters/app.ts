@@ -38,11 +38,11 @@ window.onload = () => {
         }
     }
     var newObj = Set.setter(o)
-        .prop(obj => obj.world, "world")
-        .prop(obj => obj.players, "players")
-        .all(obj => obj.data, "data")
-        .prop(obj => obj.pos, "pos")
-        .concat()
-        .modify(shuffle);
-    console.log(JSON.stringify(newObj));
+        .prop(obj => obj.world, "world") //Get the world property
+        .prop(obj => obj.players, "players") //Get the players property (array)
+        .all(obj => obj.data, "data") //Get the data property of all of the elements in the array
+        .all(obj => obj.pos, "pos") //Get the pos property of all of the elements in the array
+        .concat() //Flatten the array
+        .modify(shuffle); //Apply a modifying function
+    console.log(JSON.stringify(newObj, null, 4)); //Print the resulting structure
 };

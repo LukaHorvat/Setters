@@ -50,25 +50,14 @@ interface Setter<TWhole, TPiece> extends GenericSetter<TWhole, TPiece> {
     promote<T>(id: (piece: TPiece) => T): ArraySetter<TWhole, TPiece>
 }
 
-interface ArraySetter<TWhole, TPiece> extends GenericSetter<TWhole, TPiece[]> {
+interface ArraySetter<TWhole, TPiece> extends Setter<TWhole, TPiece[]> {
     each(): Setter<TWhole, TPiece>
-    prop<TProp>(select: (piece: TPiece) => TProp[], prop: string | number): ArrayArraySetter<TWhole, TProp>
-    prop<TProp>(select: (piece: TPiece) => TProp, prop: string | number): ArraySetter<TWhole, TProp>
-    map<T>(toT: (piece: TPiece) => T[], fromT: (t: T[]) => TPiece): ArrayArraySetter<TWhole, T>
-    map<T>(toT: (piece: TPiece) => T, fromT: (t: T) => TPiece): ArraySetter<TWhole, T>
-    promote<T>(id: (piece: TPiece) => T[]): ArrayArraySetter<TWhole, T>
-    promote<T>(id: (piece: TPiece) => T): ArraySetter<TWhole, TPiece>
     all<TProp>(select: (piece: TPiece) => TProp[], prop: string | number): ArrayArraySetter<TWhole, TProp>
     all<TProp>(select: (piece: TPiece) => TProp, prop: string | number): ArraySetter<TWhole, TProp>
 }
 
-interface ArrayArraySetter<TWhole, TPiece> extends GenericSetter<TWhole, TPiece[][]> {
-    each(): ArraySetter<TWhole, TPiece>
+interface ArrayArraySetter<TWhole, TPiece> extends ArraySetter<TWhole, TPiece[]> {
     concat(): ArraySetter<TWhole, TPiece>
-    prop<TProp>(select: (piece: TPiece) => TProp, prop: string | number): ArrayArraySetter<TWhole, TProp>
-    map<T>(toT: (piece: TPiece) => T, fromT: (t: T) => TPiece): ArrayArraySetter<TWhole, T>
-    promote<T>(id: (piece: TPiece) => T): ArrayArraySetter<TWhole, TPiece>
-    all<TProp>(select: (piece: TPiece) => TProp, prop: string | number): ArrayArraySetter<TWhole, TProp>
 }
 
 const identity = <T>(x: T) => x;

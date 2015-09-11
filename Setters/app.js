@@ -37,12 +37,12 @@ window.onload = function () {
         }
     };
     var newObj = Set.setter(o)
-        .prop(function (obj) { return obj.world; }, "world")
-        .prop(function (obj) { return obj.players; }, "players")
-        .all(function (obj) { return obj.data; }, "data")
-        .prop(function (obj) { return obj.pos; }, "pos")
-        .concat()
-        .modify(shuffle);
-    console.log(JSON.stringify(newObj));
+        .prop(function (obj) { return obj.world; }, "world") //Get the world property
+        .prop(function (obj) { return obj.players; }, "players") //Get the players property (array)
+        .all(function (obj) { return obj.data; }, "data") //Get the data property of all of the elements in the array
+        .all(function (obj) { return obj.pos; }, "pos") //Get the pos property of all of the elements in the array
+        .concat() //Flatten the array
+        .modify(shuffle); //Apply a modifying function
+    console.log(JSON.stringify(newObj, null, 4)); //Print the resulting structure
 };
 //# sourceMappingURL=app.js.map
